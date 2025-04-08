@@ -3,13 +3,13 @@ import { calculateContainerHeight, calculatePanelStyle } from "./calculateUtils"
 import { Panel } from '../types/types';
 
 describe('calculatePanelStyle', () => {
-  const defaultPanel: Panel = { id: '1', x: 1, y: 2, w: 2, h: 1, content: 'A' };
+  const defaultDimensions = { x: 1, y: 2, w: 2, h: 1 };
   const unitWidth = 100;
   const rowHeight = 50;
 
   it('패널의 위치와 크기를 계산하여 스타일 객체를 반환한다', () => {
-    const panel = {...defaultPanel};
-    const style = calculatePanelStyle({ panel, unitWidth, rowHeight });
+    const dimensions = {...defaultDimensions};
+    const style = calculatePanelStyle({ dimensions, unitWidth, rowHeight });
 
     expect(style).toEqual({
       width: 200,
@@ -19,7 +19,7 @@ describe('calculatePanelStyle', () => {
   });
 
   it('빈 객체를 넘기면 기본값을 사용하여 스타일이 계산된다', () => {
-    const style = calculatePanelStyle({ panel: {}, unitWidth, rowHeight });
+    const style = calculatePanelStyle({ dimensions: {}, unitWidth, rowHeight });
   
     expect(style).toEqual({
       width: 100,
