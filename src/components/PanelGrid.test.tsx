@@ -29,7 +29,7 @@ describe('PanelGrid', () => {
       </PanelGrid>
     );
 
-    const children = screen.getAllByTestId('grid-panel');
-    expect(children.length).toBe(panels.length);
+    const container = screen.getByTestId('grid-container');
+    expect(container.childElementCount).toBe(panels.length);
   });
 });
