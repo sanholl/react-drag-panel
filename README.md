@@ -42,3 +42,9 @@ yarn add react-drag-panel
 - 콜백 제공
 - 충돌 방지 옵션
 - 외부에서 layout 제어 가능
+
+---
+
+## License
+
+This project is licensed under the [MIT License](https://github.com/sanholl/react-drag-panel/blob/feature/grid-layout-basic/LICENSE).
