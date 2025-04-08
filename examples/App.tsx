@@ -1,5 +1,6 @@
 import React from 'react';
 import PanelGrid from '../src/components/PanelGrid';
+import './index.css';
 
 const App = () => {
   const panels = [
@@ -10,7 +11,11 @@ const App = () => {
   return (
     <div className="p-8">
       <h1 className="text-xl mb-4 font-bold">react-drag-panel 예제</h1>
-      <PanelGrid panels={panels} />
+      <PanelGrid panels={[]} cols={12} rowHeight={80} width={1800} >
+        {panels.map(panel => (
+          <div key={panel.id} className="border border-gray-300 text-center">{panel.content}</div>
+        ))}
+      </PanelGrid>
     </div>
   );
 };
