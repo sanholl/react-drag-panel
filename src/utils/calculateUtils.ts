@@ -8,7 +8,12 @@ import { Panel } from "../types/types";
  * @param rowHeight - 1 grid row 당 픽셀 높이
  * @returns React에서 사용 가능한 CSSProperties 객체
  */
-export function calculatePanelStyle(panel: Panel, unitWidth: number, rowHeight: number): React.CSSProperties {
+interface calculatePanelStyleProps {
+  panel: Panel,
+  unitWidth: number,
+  rowHeight: number
+}
+export function calculatePanelStyle({ panel, unitWidth, rowHeight }: calculatePanelStyleProps): React.CSSProperties {
   const width = panel?.w || 1;
   const height = panel?.h || 1;
   const x = panel?.x || 0;
@@ -29,7 +34,11 @@ export function calculatePanelStyle(panel: Panel, unitWidth: number, rowHeight: 
  * @param rowHeight - 1 row 당 픽셀 높이
  * @returns 컨테이너 전체 높이 (px 단위)
  */
-export function calculateContainerHeight(panels: Panel[], rowHeight: number): number {
+interface calculateContainerHeight {
+  panels: Panel[],
+  rowHeight: number
+}
+export function calculateContainerHeight({ panels, rowHeight }: calculateContainerHeight): number {
   if (panels.length === 0) return 0;
   const maxY = Math.max(...panels.map(p => (p?.y || 0) + (p?.h || 1)));
   

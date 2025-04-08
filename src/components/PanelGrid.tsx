@@ -19,7 +19,7 @@ interface PanelGridProps {
  */
 const PanelGrid = ({ panels, cols, rowHeight, width, children }: PanelGridProps): JSX.Element => {
   const unitWidth = width / cols;
-  const containerHeight = calculateContainerHeight(panels, rowHeight);
+  const containerHeight = calculateContainerHeight({ panels, rowHeight });
   const childrenArray = React.Children.toArray(children);
 
   return (
@@ -32,7 +32,7 @@ const PanelGrid = ({ panels, cols, rowHeight, width, children }: PanelGridProps)
         if (!isValidElement(child)) return null;
 
         const panel = panels[index];
-        const style = calculatePanelStyle(panel, unitWidth, rowHeight);
+        const style = calculatePanelStyle({ panel, unitWidth, rowHeight });
         const element = child as React.ReactElement<any, any>;
 
         return cloneElement(element, {
