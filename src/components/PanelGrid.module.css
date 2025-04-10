@@ -1,0 +1,7 @@
+.gridContainer {
+  position: relative;
+}
+
+.gridItemPanel {
+  position: absolute;
+}
