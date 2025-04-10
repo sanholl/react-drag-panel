@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import PanelGrid from './PanelGrid';
 import { Panel } from '../types/types';
 
-describe('PanelGrid', () => {
+describe('PanelGrid UI', () => {
   const panels: Panel[] = [
     {id: '1', x: 0, y: 0, w: 3, h: 3, content: 'Panel 1'},
     {id: '2', x: 3, y: 0, w: 3, h: 3, content: 'Panel 2'},
@@ -31,5 +31,16 @@ describe('PanelGrid', () => {
 
     const container = screen.getByTestId('grid-container');
     expect(container.childElementCount).toBe(panels.length);
+  });
+
+  it('PanelGrid에 props가 없어도 기본값으로 렌더링된다.', () => {
+    render(
+      <PanelGrid>
+        <div>Test Panel</div>
+      </PanelGrid>
+    );
+
+    const panel = screen.getByTestId('grid-panel');
+    expect(panel).toBeInTheDocument();
   });
 });

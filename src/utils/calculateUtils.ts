@@ -15,15 +15,14 @@ interface CalculatePanelStyleProps {
  *
  * @returns React에서 사용할 수 있는 CSSProperties 객체
  */
-export function calculatePanelStyle({ dimensions, unitWidth, rowHeight }: CalculatePanelStyleProps): React.CSSProperties {
-  const width = dimensions?.w || 1;
-  const height = dimensions?.h || 1;
-  const x = dimensions?.x || 0;
-  const y = dimensions?.y || 0;
-
+export function calculatePanelStyle({ 
+  dimensions: { x = 0, y = 0, w = 1, h = 1 }, 
+  unitWidth, 
+  rowHeight 
+}: CalculatePanelStyleProps): React.CSSProperties {
   return {
-    width: width * unitWidth,
-    height: height * rowHeight,
+    width: w * unitWidth,
+    height: h * rowHeight,
     transform: `translate(${x * unitWidth}px, ${y * rowHeight}px)`,
   };
 }
