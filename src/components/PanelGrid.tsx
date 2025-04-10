@@ -64,19 +64,17 @@ const PanelGrid = ({
 
   /**
    * 드래그 시작 시 호출되는 함수
-   * @param e - 드래그 이벤트
    * @param position - 드래그한 패널의 인덱스
    */
-  const dragStart = (e: React.DragEvent<HTMLDivElement>, position: number) => {
+  const dragStart = (position: number) => {
     dragItem.current = position;
   };
 
   /**
    * 드래그한 요소가 다른 요소 위에 올라갔을 때 호출되는 함수
-   * @param e - 드래그 이벤트
    * @param position - 대상 요소의 인덱스
    */
-  const dragEnter = (e: React.DragEvent<HTMLDivElement>, position: number) => {
+  const dragEnter = (position: number) => {
     dragOverItem.current = position;
   };
 
@@ -85,7 +83,7 @@ const PanelGrid = ({
    * 현재 dragItem → dragOverItem 위치로 순서를 바꿈
    * @param e - 드롭 이벤트
    */
-  const drop = (e: React.DragEvent<HTMLDivElement>) => {
+  const drop = () => {
     if (dragItem.current === null || dragOverItem.current === null) return;
 
     const newList = [...panelList];
@@ -128,8 +126,8 @@ const PanelGrid = ({
           key: panel?.id || `default-key-${index}`,
           style: { ...style, ...(element.props.style || {}) },
           className: [styles.gridItemPanel, element.props.className].filter(Boolean).join(' '),
-          onDragStart: (e: React.DragEvent<HTMLDivElement>) => dragStart(e, index),
-          onDragEnter: (e: React.DragEvent<HTMLDivElement>) => dragEnter(e, index),
+          onDragStart: () => dragStart(index),
+          onDragEnter: () => dragEnter(index),
           onDragEnd: drop,
           onDragOver: (e: React.DragEvent<HTMLDivElement>) => e.preventDefault(),
         });
