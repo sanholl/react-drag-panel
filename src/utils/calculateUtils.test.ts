@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { calculateContainerHeight, calculatePanelStyle } from "./calculateUtils";
+import { autoReposition, calculateContainerHeight, calculatePanelStyle, clamp, getDropPosition, isColliding } from "./calculateUtils";
 import { Panel } from '../types/types';
 
 describe('calculatePanelStyle()', () => {
@@ -58,5 +58,39 @@ describe('calculateContainerHeight()', () => {
   it('패널들이 하나도 없는 경우 0을 반환한다.', () => {
     const containerHeight = calculateContainerHeight({ panels: [], rowHeight });
     expect(containerHeight, 'containerHeight는 0이 나와야 한다.').toBe(0);
+  });
+});
+
+describe('getDropPosition()', () => {
+  it('마우스 좌표를 기반으로 grid 좌표를 계산한다.', () => {
+    const event = {
+      clientX: 240,
+      clientY: 160
+    } as React.DragEvent<HTMLDivElement>;
+
+    const config = {
+      containerRect: {
+        left: 100,
+        top: 100
+      } as DOMRect,
+      unitWidth: 100,
+      rowHeight: 50,
+      padding: [10, 10] as [number, number],
+      margin: [10, 10] as [number, number],
+      cols: 12,
+      maxRows: 12,
+      panelSize: { w: 1, h: 1 }
+    };
+
+    const result = getDropPosition({ event, config });
+    expect(result).toEqual({ x: 1, y: 1 });
+  });
+});
+
+describe('clamp()', () => {
+  it('값이 최소와 최대 범위를 벗어나지 않도록 제한한다', () => {
+    expect(clamp(5, 0, 10), '최대 범위인 10을 벗어나지 않았으므로 5를 반환').toBe(5);
+    expect(clamp(-1, 0, 10), '최소 범위인 0을 벗어났으므로 0을 반환').toBe(0);
+    expect(clamp(20, 0, 10), '최대 범위인 10을 벗어났으므로 10을 반환').toBe(10);
   });
 });

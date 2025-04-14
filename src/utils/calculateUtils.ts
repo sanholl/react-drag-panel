@@ -39,18 +39,85 @@ interface CalculatePanelStyleProps {
 interface CalculateContainerHeightProps {
   /** 렌더링할 패널 배열 */
   panels: Panel[];
+
   /** 한 row의 픽셀 높이 */
   rowHeight: number;
+
   /** 각 row 간의 수직 마진 (px) */
   marginY?: number;
+
   /** 컨테이너의 상하 padding 값 (px) */
   paddingY?: number;
 }
 interface isCollidingProps {
   /** 교체할 패널 */
   panel1: Dimension;
+
   /** 기존에 위치한 패널 */
   panel2: Dimension;
+}
+interface DropPositionConfig {
+  /**
+   * grid 컨테이너의 DOM 좌표 (client 기준 좌상단 좌표와 너비/높이 정보 포함)
+   * → 마우스 위치를 grid 내부 좌표로 환산하기 위해 필요
+   */
+  containerRect: DOMRect;
+
+  /**
+   * 1 grid column의 너비 (px)
+   * → 마우스 위치를 컬럼 단위로 환산할 때 사용
+   */
+  unitWidth: number;
+
+  /**
+   * 1 grid row의 높이 (px)
+   * → 마우스 위치를 row 단위로 환산할 때 사용
+   */
+  rowHeight: number;
+
+  /**
+   * [왼쪽 padding, 위쪽 padding] (px)
+   * → 전체 grid의 바깥쪽 여백 (container 기준 내부 시작 위치 보정용)
+   */
+  padding: [number, number];
+
+  /**
+   * [컬럼 간 간격, 행 간 간격] (px)
+   * → 각 grid 요소 사이의 간격 (패널 사이 여백 포함)
+   */
+  margin: [number, number];
+
+  /**
+   * grid의 총 컬럼 수
+   * → 배치 가능한 x 범위를 제한하는데 사용
+   */
+  cols: number;
+
+  /**
+   * grid에서 배치 가능한 최대 row 수
+   * → 배치 가능한 y 범위를 제한하는데 사용
+   */
+  maxRows: number;
+
+  /**
+   * 드래그 중인 패널의 크기 (w: 너비 컬럼 수, h: 높이 row 수)
+   * → 현재 좌표가 이 panel을 담을 수 있는 공간인지 판단하기 위해 필요
+   */
+  panelSize: {
+    w: number;
+    h: number;
+  };
+}
+interface DropPositionInput {
+  /**
+   * 드래그 종료 시 전달되는 마우스 이벤트 (clientX, clientY 좌표 포함)
+   */
+  event: React.DragEvent<HTMLDivElement>;
+
+  /**
+   * 위치 계산에 필요한 컨텍스트 정보
+   */
+  config: DropPositionConfig;
 }
 
 
@@ -103,11 +170,46 @@ export function calculateContainerHeight({
     (maxY - 1) * marginY +
     paddingY * 2
   );
-}
+};
+
+
+/**
+ * 마우스 좌표를 기반으로 grid 좌표를 계산합니다.
+ * @returns grid 상의 x, y 좌표
+ */
+export function getDropPosition({
+  event,
+  config: {
+    containerRect,
+    unitWidth,
+    rowHeight,
+    padding,
+    margin,
+    cols,
+    maxRows,
+    panelSize
+  }
+}: DropPositionInput): { x: number; y: number } {
+  const mouseLeft = event.clientX - containerRect.left;
+  const mouseTop = event.clientY - containerRect.top;
+
+  const maxX = cols - panelSize.w;
+  const maxY = maxRows - panelSize.h;
+
+  let newX = Math.round((mouseLeft - padding[0]) / (unitWidth + margin[0]));
+  let newY = Math.round((mouseTop - padding[1]) / (rowHeight + margin[1]));
+
+  return {
+    x: clamp(newX, 0, maxX),
+    y: clamp(newY, 0, maxY),
+  };
+};
+
 
 /**
  * container 내부로만 배치되도록 제한 (좌표 제한)
+ * @return container 내부 좌표 최대값을 넘어갈 경우 최대값으로 반환
  */
 export function clamp(value: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, value));
-}
+};

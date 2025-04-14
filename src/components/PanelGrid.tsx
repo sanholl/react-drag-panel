@@ -1,49 +1,16 @@
 import React, { cloneElement, isValidElement, useRef, useState } from 'react';
 import type { JSX } from 'react';
 import styles from './PanelGrid.module.css';
-import { calculateContainerHeight, calculatePanelStyle, clamp } from '../utils/calculateUtils';
-import { Panel } from '../types/types';
+import { calculateContainerHeight, calculatePanelStyle, clamp, getDropPosition } from '../utils/calculateUtils';
+import type { Panel } from '../types/types';
 
 interface PanelGridProps {
-  /**
-   * 렌더링할 패널 배열
-   * @default []
-   */
   panels?: Panel[];
-
-  /**
-   * 한 줄에 표시할 컬럼 개수
-   * @default 12
-   */
   cols?: number;
-
-  /**
-   * 한 grid row 당 높이 (px)
-   * @default 100
-   */
   rowHeight?: number;
-
-  /**
-   * 전체 grid의 너비 (px)
-   * @default 1200
-   */
   width?: number;
-
-  /**
-   * 각 grid 간의 간격 - [수평, 수직]
-   * @default [0,0]
-   */
   margin?: [number, number];
-
-  /**
-   * grid 컨테이너의 안쪽 여백 - [수평, 수직]
-   * @default [0,0]
-   */
   padding?: [number, number];
-
-  /**
-   * 각 패널에 매핑될 자식 컴포넌트들
-   */
   children?: React.ReactNode;
 }
 
@@ -75,11 +42,11 @@ const PanelGrid = ({
   const containerRef = useRef<HTMLDivElement>(null);
 
   const unitWidth = width / cols;
-  const containerHeight = calculateContainerHeight({ 
-    panels: panelList, 
-    rowHeight, 
-    marginY: margin[1], 
-    paddingY: padding[1] 
+  const containerHeight = calculateContainerHeight({
+    panels: panelList,
+    rowHeight,
+    marginY: margin[1],
+    paddingY: padding[1],
   });
   const childrenArray = React.Children.toArray(children);
 
@@ -105,34 +72,32 @@ const PanelGrid = ({
    */
   const drop = (event: React.DragEvent<HTMLDivElement>) => {
     if (dragItem.current === null || !containerRef.current) return;
-    const dragedPanel = panelList[dragItem.current];
-    const { w = 1, h = 1 } = dragedPanel;
+
+    const draggedIndex = dragItem.current;
+    const draggedPanel = panelList[draggedIndex];
+    const { w = 1, h = 1 } = draggedPanel;
 
     const containerRect = containerRef.current.getBoundingClientRect();
-    const containerLeft = containerRect.left;
-    const containerTop = containerRect.top;
-
-    const mouseLeft = event.clientX - containerLeft;
-    const mouseTop = event.clientY - containerTop;
-
     const maxRows = Math.floor(containerHeight / rowHeight);
-    const maxX = cols - w;
-    const maxY = maxRows - h;
-    
-    let newX = Math.round((mouseLeft - padding[0]) / (unitWidth + margin[0]));
-    let newY = Math.round((mouseTop - padding[1]) / (rowHeight + margin[1]));
 
-    newX = clamp(newX, 0, maxX);
-    newY = clamp(newY, 0, maxY);
-  
-    const updatedPanels = panelList.map(panel => {
-      if (panel.id === dragedPanel.id) {
-        return { ...panel, x: newX, y: newY };
-      }
-  
-      return panel;
+    const { x, y } = getDropPosition({
+      event,
+      config: {
+        containerRect,
+        unitWidth,
+        rowHeight,
+        padding,
+        margin,
+        cols,
+        maxRows,
+        panelSize: { w, h }
+      },
     });
-  
+
+    const updatedPanels = panelList.map((panel, index) =>
+      index === draggedIndex ? { ...panel, x, y } : panel
+    );
+
     setPanelList(updatedPanels);
   };
 
@@ -170,9 +135,10 @@ const PanelGrid = ({
           draggable: true,
           key: panel?.id || `default-key-${index}`,
           style: { ...style, ...(element.props.style || {}) },
-          className: [styles.gridItemPanel, element.props.className].filter(Boolean).join(' '),
+          className: [styles.gridItemPanel, element.props.className]
+            .filter(Boolean)
+            .join(' '),
           onDragStart: () => dragStart(index),
-          onDragEnter: () => dragEnter(index),
           onDragEnd: drop,
           onDragOver: (e: React.DragEvent<HTMLDivElement>) => e.preventDefault(),
         });
