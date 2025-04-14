@@ -5,18 +5,61 @@ import { autoReposition, calculateContainerHeight, calculatePanelStyle, getDropP
 import type { Panel } from '../types/types';
 
 interface PanelGridProps {
+  /** 
+   * 렌더링할 패널 배열 
+   * 각 패널은 위치(x, y), 크기(w, h), 고유 id 등을 포함함
+   */
   panels?: Panel[];
+
+  /** 
+   * 한 줄에 배치할 컬럼 수 
+   * 기본값은 12
+   */
   cols?: number;
+
+  /** 
+   * 한 grid row 당 높이 (px 단위) 
+   * 패널 높이 계산에 사용됨 
+   */
   rowHeight?: number;
+
+  /** 
+   * 전체 grid 컨테이너의 너비 (px 단위) 
+   */
   width?: number;
+
+  /** 
+   * 각 패널 사이의 간격: [수평(px), 수직(px)] 
+   * 기본값은 [0, 0]
+   */
   margin?: [number, number];
+
+  /** 
+   * grid 컨테이너의 안쪽 여백: [좌우(px), 상하(px)] 
+   * 기본값은 [0, 0]
+   */
   padding?: [number, number];
+
+  /** 
+   * 각 패널에 대응되는 자식 React 요소들 
+   */
   children?: React.ReactNode;
 }
 
 interface GridChildProps extends React.HTMLAttributes<HTMLDivElement> {
+  /** 
+   * 외부에서 전달할 style 속성 (override 가능)
+   */
   style?: React.CSSProperties;
+
+  /** 
+   * 클래스명을 문자열 형태로 전달
+   */
   className?: string;
+
+  /** 
+   * 테스트 용도의 식별자 (data-testid)
+   */
   'data-testid'?: string;
 };
 
@@ -66,7 +109,7 @@ const PanelGrid = ({
 
   /**
    * 드래그가 종료되었을 때 호출되는 함수
-   * @param e - 드롭 이벤트
+   * @param event - 드롭 이벤트
    */
   const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
     if (dragItem.current === null || !containerRef.current) return;
