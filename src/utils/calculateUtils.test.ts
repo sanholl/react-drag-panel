@@ -94,3 +94,30 @@ describe('clamp()', () => {
     expect(clamp(20, 0, 10), '최대 범위인 10을 벗어났으므로 10을 반환').toBe(10);
   });
 });
+
+describe('isColliding()', () => {
+  it('두 패널이 겹치는 경우 true를 반환한다', () => {
+    const a = { x: 0, y: 0, w: 2, h: 2 };
+    const b = { x: 1, y: 1, w: 2, h: 2 };
+    expect(isColliding({ panel1: a, panel2: b })).toBe(true);
+  });
+
+  it('두 패널이 겹치지 않는 경우 false를 반환한다', () => {
+    const a = { x: 0, y: 0, w: 2, h: 2 };
+    const b = { x: 3, y: 3, w: 2, h: 2 };
+    expect(isColliding({ panel1: a, panel2: b })).toBe(false);
+  });
+});
+
+describe('autoReposition()', () => {
+  it('겹치는 패널이 아래쪽으로 한 칸씩 이동되도록 조정한다', () => {
+    const panels = [
+      { id: '1', x: 0, y: 0, w: 1, h: 1 },
+      { id: '2', x: 0, y: 0, w: 1, h: 1 }
+    ];
+
+    const result = autoReposition(panels);
+    expect(result[0].y).toBe(0);
+    expect(result[1].y).toBe(1);
+  });
+});

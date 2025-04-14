@@ -1,7 +1,7 @@
-import React, { cloneElement, isValidElement, useRef, useState } from 'react';
+import React, { cloneElement, isValidElement, useEffect, useRef, useState } from 'react';
 import type { JSX } from 'react';
 import styles from './PanelGrid.module.css';
-import { calculateContainerHeight, calculatePanelStyle, clamp, getDropPosition } from '../utils/calculateUtils';
+import { autoReposition, calculateContainerHeight, calculatePanelStyle, clamp, getDropPosition } from '../utils/calculateUtils';
 import type { Panel } from '../types/types';
 
 interface PanelGridProps {
@@ -94,12 +94,18 @@ const PanelGrid = ({
       },
     });
 
-    const updatedPanels = panelList.map((panel, index) =>
-      index === draggedIndex ? { ...panel, x, y } : panel
+    const updatedPanels = autoReposition(
+      panelList.map((panel, index) =>
+        index === draggedIndex ? { ...panel, x, y } : panel
+      )
     );
 
     setPanelList(updatedPanels);
   };
+
+  useEffect(() => {
+    setPanelList(prev => autoReposition(prev));
+  }, [panelList]);
 
   return (
     <div
