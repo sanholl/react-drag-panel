@@ -60,16 +60,18 @@ describe('PanelGrid - Drag and Drop', () => {
         <div>Panel 3</div>
       </PanelGrid>
     );
-
-    const panel = screen.getByText('Panel 1').closest('.gridItemPanel') as HTMLElement;
+  
+    const panelEls = screen.getAllByTestId('grid-panel');
+    const panel = panelEls[0]; // Panel 1
+  
     const beforeTransform = panel.style.transform;
-
+  
     fireEvent.dragStart(panel);
     fireEvent.dragEnd(panel, {
       clientX: 300,
       clientY: 200,
     });
-
+  
     const afterTransform = panel.style.transform;
     expect(afterTransform).not.toBe(beforeTransform);
   });
@@ -83,22 +85,23 @@ describe('PanelGrid - Drag and Drop', () => {
       </PanelGrid>
     );
 
-    const panel1 = screen.getByText('Panel 1').closest('.gridItemPanel') as HTMLElement;
-    const panel2 = screen.getByText('Panel 2').closest('.gridItemPanel') as HTMLElement;
-
+    const panelEls = screen.getAllByTestId('grid-panel');
+    const panel1 = panelEls[0];
+    const panel2 = panelEls[1];
+    
     const before1 = panel1.style.transform;
     const before2 = panel2.style.transform;
-
+    
     fireEvent.dragStart(panel1);
     fireEvent.dragEnd(panel1, { clientX: 200, clientY: 100 });
-
+    
     fireEvent.dragStart(panel2);
     fireEvent.dragEnd(panel2, { clientX: 400, clientY: 150 });
-
+    
     const after1 = panel1.style.transform;
     const after2 = panel2.style.transform;
-
+    
     expect(after1).not.toBe(before1);
-    expect(after2).not.toBe(before2);
+    expect(after2).not.toBe(before2);    
   });
 });

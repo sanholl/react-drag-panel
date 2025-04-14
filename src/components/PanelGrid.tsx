@@ -131,6 +131,7 @@ const PanelGrid = ({
         const element = child as React.ReactElement<GridChildProps>;
 
         return cloneElement(element, {
+          'data-testid': 'grid-panel',
           draggable: true,
           key: panel?.id || `default-key-${index}`,
           style: { ...style, ...(element.props.style || {}) },
