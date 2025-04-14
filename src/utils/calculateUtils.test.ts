@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { calculateContainerHeight, calculatePanelStyle } from "./calculateUtils";
 import { Panel } from '../types/types';
 
-describe('calculatePanelStyle', () => {
+describe('calculatePanelStyle()', () => {
   const defaultDimensions = { x: 1, y: 2, w: 2, h: 1 };
   const unitWidth = 100;
   const rowHeight = 50;
@@ -29,7 +29,7 @@ describe('calculatePanelStyle', () => {
   });
 });
 
-describe('calculateContainerHeight', () => {
+describe('calculateContainerHeight()', () => {
   const defaultPanel: Panel[] = [
     { id: '1', x: 0, y: 0, w: 2, h: 1, content: 'A' },
     { id: '2', x: 1, y: 1, w: 1, h: 2, content: 'B' },
