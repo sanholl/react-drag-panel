@@ -54,23 +54,15 @@ const PanelGrid = ({
    * 드래그 시작 시 호출되는 함수
    * @param position - 드래그한 패널의 인덱스
    */
-  const dragStart = (position: number) => {
+  const handleDragStart = (position: number) => {
     dragItem.current = position;
-  };
-
-  /**
-   * 드래그한 요소가 다른 요소 위에 올라갔을 때 호출되는 함수
-   * @param position - 대상 요소의 인덱스
-   */
-  const dragEnter = (position: number) => {
-    // 겹침이 있는 경우 위치 변환
   };
 
   /**
    * 드래그가 종료되었을 때 호출되는 함수
    * @param e - 드롭 이벤트
    */
-  const drop = (event: React.DragEvent<HTMLDivElement>) => {
+  const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
     if (dragItem.current === null || !containerRef.current) return;
 
     const draggedIndex = dragItem.current;
@@ -137,15 +129,14 @@ const PanelGrid = ({
         const element = child as React.ReactElement<any, any>;
 
         return cloneElement(element, {
-          'data-testid': 'grid-panel',
           draggable: true,
           key: panel?.id || `default-key-${index}`,
           style: { ...style, ...(element.props.style || {}) },
           className: [styles.gridItemPanel, element.props.className]
             .filter(Boolean)
             .join(' '),
-          onDragStart: () => dragStart(index),
-          onDragEnd: drop,
+          onDragStart: () => handleDragStart(index),
+          onDragEnd: handleDrop,
           onDragOver: (e: React.DragEvent<HTMLDivElement>) => e.preventDefault(),
         });
       })}

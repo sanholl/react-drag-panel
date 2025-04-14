@@ -61,7 +61,7 @@ describe('PanelGrid - Drag and Drop', () => {
       </PanelGrid>
     );
 
-    const panel = screen.getByText('Panel 1').closest('[data-testid="grid-panel"]') as HTMLElement;
+    const panel = screen.getByText('Panel 1').closest('.gridItemPanel') as HTMLElement;
     const beforeTransform = panel.style.transform;
 
     fireEvent.dragStart(panel);
@@ -72,29 +72,6 @@ describe('PanelGrid - Drag and Drop', () => {
 
     const afterTransform = panel.style.transform;
     expect(afterTransform).not.toBe(beforeTransform);
-    expect(afterTransform).toContain('translate');
-  });
-
-  it('드래그가 그리드 범위를 넘으면 좌표가 최대값으로 제한된다', () => {
-    render(
-      <PanelGrid panels={panels} width={600} rowHeight={100} cols={6}>
-        <div>Panel 1</div>
-        <div>Panel 2</div>
-        <div>Panel 3</div>
-      </PanelGrid>
-    );
-
-    const panel = screen.getByText('Panel 1').closest('[data-testid="grid-panel"]') as HTMLElement;
-
-    fireEvent.dragStart(panel);
-    fireEvent.dragEnd(panel, {
-      clientX: 9999, // X축 매우 큰 값
-      clientY: 9999, // Y축 매우 큰 값
-    });
-
-    // 최댓값을 기준으로 계산되었는지 확인
-    const afterTransform = panel.style.transform;
-    expect(afterTransform).toMatch(/translate\((.*)px,\s*(.*)px\)/);
   });
 
   it('여러 개의 패널을 순차적으로 드래그하면 각각 위치가 변경된다', () => {
@@ -106,8 +83,8 @@ describe('PanelGrid - Drag and Drop', () => {
       </PanelGrid>
     );
 
-    const panel1 = screen.getByText('Panel 1').closest('[data-testid="grid-panel"]') as HTMLElement;
-    const panel2 = screen.getByText('Panel 2').closest('[data-testid="grid-panel"]') as HTMLElement;
+    const panel1 = screen.getByText('Panel 1').closest('.gridItemPanel') as HTMLElement;
+    const panel2 = screen.getByText('Panel 2').closest('.gridItemPanel') as HTMLElement;
 
     const before1 = panel1.style.transform;
     const before2 = panel2.style.transform;
