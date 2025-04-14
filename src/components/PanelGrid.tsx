@@ -1,7 +1,7 @@
 import React, { cloneElement, isValidElement, useEffect, useRef, useState } from 'react';
 import type { JSX } from 'react';
 import styles from './PanelGrid.module.css';
-import { autoReposition, calculateContainerHeight, calculatePanelStyle, clamp, getDropPosition } from '../utils/calculateUtils';
+import { autoReposition, calculateContainerHeight, calculatePanelStyle, getDropPosition } from '../utils/calculateUtils';
 import type { Panel } from '../types/types';
 
 interface PanelGridProps {
@@ -13,6 +13,12 @@ interface PanelGridProps {
   padding?: [number, number];
   children?: React.ReactNode;
 }
+
+interface GridChildProps extends React.HTMLAttributes<HTMLDivElement> {
+  style?: React.CSSProperties;
+  className?: string;
+  'data-testid'?: string;
+};
 
 /**
  * PanelGrid는 주어진 패널 데이터를 기반으로 고정된 컬럼 수와 행 높이에 따라
@@ -126,7 +132,7 @@ const PanelGrid = ({
           paddingY: padding[1],
         });
 
-        const element = child as React.ReactElement<any, any>;
+        const element = child as React.ReactElement<GridChildProps>;
 
         return cloneElement(element, {
           draggable: true,

@@ -196,8 +196,8 @@ export function getDropPosition({
   const maxX = cols - panelSize.w;
   const maxY = maxRows - panelSize.h;
 
-  let newX = Math.round((mouseLeft - padding[0]) / (unitWidth + margin[0]));
-  let newY = Math.round((mouseTop - padding[1]) / (rowHeight + margin[1]));
+  const newX = Math.round((mouseLeft - padding[0]) / (unitWidth + margin[0]));
+  const newY = Math.round((mouseTop - padding[1]) / (rowHeight + margin[1]));
 
   return {
     x: clamp(newX, 0, maxX),
