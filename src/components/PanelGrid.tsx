@@ -1,4 +1,4 @@
-import React, { cloneElement, isValidElement, useEffect, useRef, useState } from 'react';
+import React, { cloneElement, isValidElement, useRef, useState } from 'react';
 import type { JSX } from 'react';
 import styles from './PanelGrid.module.css';
 import { autoReposition, calculateContainerHeight, calculatePanelStyle, getDropPosition } from '../utils/calculateUtils';
@@ -100,10 +100,6 @@ const PanelGrid = ({
 
     setPanelList(updatedPanels);
   };
-
-  useEffect(() => {
-    setPanelList(prev => autoReposition(prev));
-  }, [panelList]);
 
   return (
     <div
