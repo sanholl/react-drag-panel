@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { autoReposition, calculateContainerHeight, calculatePanelStyle, clamp, getDropPosition, isColliding } from "./calculateUtils";
+import { autoReposition, calculateContainerHeight, calculatePanelStyle, getDropPosition } from "./calculateUtils";
 import { Panel } from '../types/types';
+import { clamp, isColliding } from "./utils";
 
 describe('calculatePanelStyle()', () => {
   const defaultDimensions = { x: 1, y: 2, w: 2, h: 1 };
@@ -99,13 +100,13 @@ describe('isColliding()', () => {
   it('두 패널이 겹치는 경우 true를 반환한다', () => {
     const a = { x: 0, y: 0, w: 2, h: 2 };
     const b = { x: 1, y: 1, w: 2, h: 2 };
-    expect(isColliding({ panel1: a, panel2: b })).toBe(true);
+    expect(isColliding(a, b)).toBe(true);
   });
 
   it('두 패널이 겹치지 않는 경우 false를 반환한다', () => {
     const a = { x: 0, y: 0, w: 2, h: 2 };
     const b = { x: 3, y: 3, w: 2, h: 2 };
-    expect(isColliding({ panel1: a, panel2: b })).toBe(false);
+    expect(isColliding(a, b)).toBe(false);
   });
 });
 

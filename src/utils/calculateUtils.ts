@@ -1,4 +1,5 @@
 import { Panel } from "../types/types";
+import { clamp, isColliding } from "./utils";
 
 type Dimension = Pick<Panel, 'w' | 'h' | 'x' | 'y'>;
 interface CalculatePanelStyleProps {
@@ -48,13 +49,6 @@ interface CalculateContainerHeightProps {
 
   /** 컨테이너의 상하 padding 값 (px) */
   paddingY?: number;
-}
-interface isCollidingProps {
-  /** 교체할 패널 */
-  panel1: Dimension;
-
-  /** 기존에 위치한 패널 */
-  panel2: Dimension;
 }
 interface DropPositionConfig {
   /**
@@ -205,32 +199,6 @@ export function getDropPosition({
   };
 };
 
-
-/**
- * container 내부로만 배치되도록 제한 (좌표 제한)
- * @return container 내부 좌표 최대값을 넘어갈 경우 최대값으로 반환
- */
-export function clamp(value: number, min: number, max: number): number {
-  return Math.max(min, Math.min(max, value));
-};
-
-
-/**
- * 두 패널이 겹치는지 여부를 반환합니다.
- * @returns true = 겹침, false = 겹치지 않음
- */
-export function isColliding({ panel1, panel2 }: isCollidingProps): boolean {
-  const a = { x: 0, y: 0, w: 0, h: 0, ...panel1 };
-  const b = { x: 0, y: 0, w: 0, h: 0, ...panel2 };
-
-  return !(
-    a.x + a.w <= b.x || // 오른쪽
-    a.x >= b.x + b.w || // 왼쪽
-    a.y + a.h <= b.y || // 아래
-    a.y >= b.y + b.h    // 위
-  );
-};
-
 /**
  * 겹치는 패널이 있을 경우, 아래로 한 칸씩 밀어 재배치하는 함수
  * @returns 충돌 없이 재배치된 패널 배열
@@ -245,7 +213,7 @@ export function autoReposition(panels: Panel[]): Panel[] {
     let newY = panel.y || 0;
     while (
       result.some(p =>
-        isColliding({ panel1: { ...panel, y: newY }, panel2: p })
+        isColliding({ ...panel, y: newY }, p )
       )
     ) {
       newY++;
