@@ -18,9 +18,9 @@ export function isColliding(panel1: Panel, panel2: Panel): boolean {
   const b = { x: 0, y: 0, w: 0, h: 0, ...panel2 };
 
   return !(
-    a.x + a.w <= b.x || // 오른쪽
-    a.x >= b.x + b.w || // 왼쪽
-    a.y + a.h <= b.y || // 아래
-    a.y >= b.y + b.h    // 위
+    a.x + a.w <= b.x ||
+    a.x >= b.x + b.w ||
+    a.y + a.h <= b.y ||
+    a.y >= b.y + b.h
   );
 };
