@@ -181,45 +181,65 @@ export function getDropPosition({
     margin,
     cols,
     maxRows,
-    panelSize
-  }
+    panelSize,
+  },
 }: DropPositionInput): { x: number; y: number } {
   const mouseLeft = event.clientX - containerRect.left;
   const mouseTop = event.clientY - containerRect.top;
 
+  const panelWidth = unitWidth * panelSize.w + margin[0] * (panelSize.w - 1);
+  const panelHeight = rowHeight * panelSize.h + margin[1] * (panelSize.h - 1);
+
+  const adjustedLeft = mouseLeft - padding[0] - panelWidth / 2;
+  const adjustedTop = mouseTop - padding[1] - panelHeight / 2;
+
+  const newX = Math.round(adjustedLeft / (unitWidth + margin[0]));
+  const newY = Math.round(adjustedTop / (rowHeight + margin[1]));
+
   const maxX = cols - panelSize.w;
   const maxY = maxRows - panelSize.h;
-
-  const newX = Math.round((mouseLeft - padding[0]) / (unitWidth + margin[0]));
-  const newY = Math.round((mouseTop - padding[1]) / (rowHeight + margin[1]));
 
   return {
     x: clamp(newX, 0, maxX),
     y: clamp(newY, 0, maxY),
   };
-};
+}
 
 /**
- * 겹치는 패널이 있을 경우, 아래로 한 칸씩 밀어 재배치하는 함수
- * @returns 충돌 없이 재배치된 패널 배열
+ * 드롭된 패널을 해당 위치에 고정시키고,
+ * 충돌하는 다른 패널들을 재귀적으로 아래로 밀어주는 함수
+ * 
+ * @param draggedPanel 드롭 위치가 적용된 이동된 패널
+ * @param panels 기존 패널 배열 (draggedPanel 포함)
+ * @returns 충돌이 해결된 새로운 패널 배열
  */
-export function autoReposition(panels: Panel[]): Panel[] {
-  const sorted = [...panels].sort(
-    (a, b) => (a.y || 0) - (b.y || 0) || (a.x || 0) - (b.x || 0)
+export function resolveCollisions(
+  draggedPanel: Panel,
+  panels: Panel[]
+): Panel[] {
+  const newPanels = panels.map(p =>
+    p.id === draggedPanel.id ? draggedPanel : { ...p }
   );
-  const result: Panel[] = [];
 
-  for (const panel of sorted) {
-    let newY = panel.y || 0;
-    while (
-      result.some(p =>
-        isColliding({ ...panel, y: newY }, p )
-      )
-    ) {
-      newY++;
+  const visited = new Set<string>();
+
+  function pushDown(panel: Panel) {
+    if (!panel.id) return;
+    if (visited.has(panel.id)) return;
+    visited.add(panel.id);
+
+    for (const other of newPanels) {
+      if (panel.id === other.id) continue;
+
+      if (isColliding(panel, other)) {
+        // 겹치는 패널을 아래로 한 칸 밀기
+        other.y = (panel.y || 0) + (panel.h || 1);
+        pushDown(other); // 재귀적으로 처리
+      }
     }
-    result.push({ ...panel, y: newY });
   }
 
-  return result;
-};
+  pushDown(draggedPanel);
+
+  return newPanels;
+}

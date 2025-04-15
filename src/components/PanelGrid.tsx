@@ -1,8 +1,9 @@
 import React, { cloneElement, isValidElement, useRef, useState } from 'react';
 import type { JSX } from 'react';
 import styles from './PanelGrid.module.css';
-import { autoReposition, calculateContainerHeight, calculatePanelStyle, getDropPosition } from '../utils/calculateUtils';
+import { calculateContainerHeight, calculatePanelStyle, getDropPosition, resolveCollisions } from '../utils/calculateUtils';
 import type { Panel } from '../types/types';
+import { isColliding } from '../utils/utils';
 
 interface PanelGridProps {
   /** 
@@ -89,6 +90,14 @@ const PanelGrid = ({
   const [panelList, setPanelList] = useState<Panel[]>(panels);
   const dragItem = useRef<number | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const originalPanels = useRef<Panel[]>(panels); // 드래그 시작 전에 백업
+
+  const [dragOverPosition, setDragOverPosition] = useState<{
+    x: number;
+    y: number;
+    w: number;
+    h: number;
+  } | null>(null);  
 
   const unitWidth = width / cols;
   const containerHeight = calculateContainerHeight({
@@ -105,7 +114,54 @@ const PanelGrid = ({
    */
   const handleDragStart = (position: number) => {
     dragItem.current = position;
+    originalPanels.current = panelList.map(p => ({ ...p }));
   };
+
+  /**
+   * 드래그가 지속되는 동안 호출되는 함수
+   * @param event - 드래그 이벤트
+   */
+  const handleDrag = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    if (dragItem.current === null || !containerRef.current) return;
+  
+    const draggedIndex = dragItem.current;
+    const draggedPanel = panelList[draggedIndex];
+    const { w = 1, h = 1 } = draggedPanel;
+  
+    const containerRect = containerRef.current.getBoundingClientRect();
+    const maxRows = Math.floor(containerHeight / rowHeight);
+  
+    const { x, y } = getDropPosition({
+      event,
+      config: {
+        containerRect,
+        unitWidth,
+        rowHeight,
+        padding,
+        margin,
+        cols,
+        maxRows,
+        panelSize: { w, h }
+      },
+    });
+  
+    setDragOverPosition({ x, y, w, h });
+  
+    const tempDragged = { ...draggedPanel, x, y };
+  
+    const isOverlap = panelList.some((panel, idx) => {
+      if (idx === draggedIndex) return false;
+      return isColliding(tempDragged, panel);
+    });
+  
+    if (isOverlap) {
+      const updated = resolveCollisions(tempDragged, panelList);
+      setPanelList(updated);
+    } else {
+      setPanelList(originalPanels.current.map(p => ({ ...p })));
+    }
+  };  
 
   /**
    * 드래그가 종료되었을 때 호출되는 함수
@@ -135,13 +191,13 @@ const PanelGrid = ({
       },
     });
 
-    const updatedPanels = autoReposition(
-      panelList.map((panel, index) =>
-        index === draggedIndex ? { ...panel, x, y } : panel
-      )
+    const updatedPanels = resolveCollisions(
+      { ...draggedPanel, x: x, y: y },
+      panelList
     );
 
     setPanelList(updatedPanels);
+    setDragOverPosition(null);
   };
 
   return (
@@ -151,9 +207,25 @@ const PanelGrid = ({
       className={styles.gridContainer}
       data-testid="grid-container"
     >
+      {dragOverPosition && (
+        <div
+          className={styles.dropIndicator}
+          style={calculatePanelStyle({
+            dimensions: dragOverPosition,
+            unitWidth,
+            rowHeight,
+            cols,
+            marginX: margin[0],
+            marginY: margin[1],
+            paddingX: padding[0],
+            paddingY: padding[1],
+          })}
+        />
+      )}
+
       {childrenArray.map((child, index) => {
         if (!isValidElement(child)) return null;
-
+        
         const panel = panelList[index];
         const style = calculatePanelStyle({
           dimensions: {
@@ -183,7 +255,7 @@ const PanelGrid = ({
             .join(' '),
           onDragStart: () => handleDragStart(index),
           onDragEnd: handleDrop,
-          onDragOver: (e: React.DragEvent<HTMLDivElement>) => e.preventDefault(),
+          onDrag: handleDrag,
         });
       })}
     </div>
