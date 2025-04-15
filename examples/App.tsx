@@ -4,12 +4,12 @@ import './index.css';
 
 const App = () => {
   const panels = [
-    { id: '1', x: 0, y: 0, w: 1, h: 2, content: 'Panel 1' },
-    { id: '2', x: 1, y: 0, w: 2, h: 1, content: 'Panel 2' },
-    { id: '3', x: 3, y: 0, w: 2, h: 1, content: 'Panel 3' },
-    { id: '4', x: 5, y: 0, w: 1, h: 1, content: 'Panel 4' },
-    { id: '5', x: 0, y: 2, w: 12, h: 1, content: 'Panel 5' },
-    { id: '6', x: 12, y: 12, w: 1, h: 1, content: 'Panel 6' }
+    { id: '1', x: 0, y: 0, w: 4, h: 8, content: 'Panel 1' },
+    { id: '2', x: 4, y: 0, w: 4, h: 4, content: 'Panel 2' },
+    { id: '3', x: 8, y: 0, w: 4, h: 4, content: 'Panel 3' },
+    { id: '4', x: 12, y: 0, w: 4, h: 4, content: 'Panel 4' },
+    { id: '5', x: 0, y: 8, w: 12, h: 4, content: 'Panel 5' },
+    { id: '6', x: 12, y: 12, w: 4, h: 4, content: 'Panel 6' }
   ];
 
   return (
@@ -17,7 +17,7 @@ const App = () => {
       <h1 className="text-xl mb-4 font-bold">react-drag-panel 예제</h1>
       <PanelGrid 
         panels={panels}
-        cols={12}
+        cols={24}
         rowHeight={40} 
         width={1200} 
         margin={[10, 10]}
