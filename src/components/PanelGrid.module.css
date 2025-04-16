@@ -5,3 +5,12 @@
 .gridItemPanel {
   position: absolute;
 }
+
+.dropIndicator {
+  position: absolute;
+  background-color: rgba(0, 128, 255, 0.2);
+  border: 2px dashed #007aff;
+  border-radius: 6px;
+  pointer-events: none;
+  z-index: 999;
+}
