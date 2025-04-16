@@ -88,31 +88,29 @@ describe('getDropPosition()', () => {
 });
 
 describe('resolveCollisions()', () => {
-  describe('resolveCollisions()', () => {
-    it('겹침이 없는 경우 위치는 그대로 유지된다', () => {
-      const panels: Panel[] = [
-        { id: '1', x: 0, y: 0, w: 1, h: 1 },
-        { id: '2', x: 1, y: 0, w: 1, h: 1 },
-        { id: '3', x: 0, y: 2, w: 1, h: 1 }
-      ];
-  
-      const result = resolveCollisions({ id: '1', x: 0, y: 0, w: 1, h: 1 }, panels);
-  
-      expect(result.find(p => p.id === '2')?.y).toBe(0);
-      expect(result.find(p => p.id === '3')?.y).toBe(2);
-    });
-  
-    it('충돌이 발생하면 재귀적으로 아래로 밀려나며 visited로 중복 호출을 방지한다', () => {
-      const panels: Panel[] = [
-        { id: '1', x: 0, y: 0, w: 1, h: 2 },
-        { id: '2', x: 0, y: 1, w: 1, h: 2 },
-        { id: '3', x: 0, y: 3, w: 1, h: 1 }
-      ];
-  
-      const result = resolveCollisions({ id: '1', x: 0, y: 0, w: 1, h: 2 }, panels);
-  
-      expect(result.find(p => p.id === '2')?.y, '패널2는 패널1과 겹치므로 y:2로 이동됨').toBe(2);
-      expect(result.find(p => p.id === '3')?.y, '패널3은 패널2의 겹치므로 y:4로 이동됨').toBe(4);
-    });
+  it('겹침이 없는 경우 위치는 그대로 유지된다', () => {
+    const panels: Panel[] = [
+      { id: '1', x: 0, y: 0, w: 1, h: 1 },
+      { id: '2', x: 1, y: 0, w: 1, h: 1 },
+      { id: '3', x: 0, y: 2, w: 1, h: 1 }
+    ];
+
+    const result = resolveCollisions({ id: '1', x: 0, y: 0, w: 1, h: 1 }, panels);
+
+    expect(result.find(p => p.id === '2')?.y).toBe(0);
+    expect(result.find(p => p.id === '3')?.y).toBe(2);
+  });
+
+  it('충돌이 발생하면 재귀적으로 아래로 밀려나며 visited로 중복 호출을 방지한다', () => {
+    const panels: Panel[] = [
+      { id: '1', x: 0, y: 0, w: 1, h: 2 },
+      { id: '2', x: 0, y: 1, w: 1, h: 2 },
+      { id: '3', x: 0, y: 3, w: 1, h: 1 }
+    ];
+
+    const result = resolveCollisions({ id: '1', x: 0, y: 0, w: 1, h: 2 }, panels);
+
+    expect(result.find(p => p.id === '2')?.y, '패널2는 패널1과 겹치므로 y:2로 이동됨').toBe(2);
+    expect(result.find(p => p.id === '3')?.y, '패널3은 패널2의 겹치므로 y:4로 이동됨').toBe(4);
   });
 });

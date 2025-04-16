@@ -1,4 +1,4 @@
-import React, { cloneElement, isValidElement, useRef, useState } from 'react';
+import React, { cloneElement, isValidElement, useMemo, useRef, useState } from 'react';
 import type { JSX } from 'react';
 import styles from './PanelGrid.module.css';
 import { calculateContainerHeight, calculatePanelStyle, getDropPosition, resolveCollisions } from '../utils/calculateUtils';
@@ -67,16 +67,6 @@ interface GridChildProps extends React.HTMLAttributes<HTMLDivElement> {
 /**
  * PanelGrid는 주어진 패널 데이터를 기반으로 고정된 컬럼 수와 행 높이에 따라
  * 격자 형태로 자식 컴포넌트를 배치하고, 드래그 앤 드롭을 통해 순서를 재배치할 수 있는 컴포넌트입니다.
- *
- * @component
- * @param {Panel[]} [panels=[]] - 렌더링할 패널 배열
- * @param {number} [cols=12] - 한 줄당 컬럼 수
- * @param {number} [rowHeight=100] - 각 행(row)의 높이(px)
- * @param {number} [width=1200] - 전체 그리드의 너비(px)
- * @param {[number, number]} [margin=[0, 0]] - 각 grid 간의 간격(px)
- * @param {[number, number]} [padding=[0, 0]] - grid 컨테이너의 안쪽 여백(px)
- * @param {React.ReactNode} children - 각 패널과 연결될 React 요소들
- * @returns {JSX.Element} 렌더링된 패널 그리드 컴포넌트
  */
 const PanelGrid = ({
   panels = [],
@@ -88,16 +78,17 @@ const PanelGrid = ({
   children,
 }: PanelGridProps): JSX.Element => {
   const [panelList, setPanelList] = useState<Panel[]>(panels);
-  const dragItem = useRef<number | null>(null);
+  const dragItem = useRef<Panel | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const originalPanels = useRef<Panel[]>(panels); // 드래그 시작 전에 백업
+  const originalPanels = useRef<Panel[]>(panels);
+  const lastDragOverPosRef = useRef<{ x: number; y: number } | null>(null);
 
   const [dragOverPosition, setDragOverPosition] = useState<{
     x: number;
     y: number;
     w: number;
     h: number;
-  } | null>(null);  
+  } | null>(null);
 
   const unitWidth = width / cols;
   const containerHeight = calculateContainerHeight({
@@ -106,32 +97,32 @@ const PanelGrid = ({
     marginY: margin[1],
     paddingY: padding[1],
   });
-  const childrenArray = React.Children.toArray(children);
+  const childrenArray = useMemo(() => React.Children.toArray(children), [children]);
+
 
   /**
    * 드래그 시작 시 호출되는 함수
-   * @param position - 드래그한 패널의 인덱스
    */
-  const handleDragStart = (position: number) => {
-    dragItem.current = position;
+  const handleDragStart = (panel: Panel) => {
+    dragItem.current = panel;
     originalPanels.current = panelList.map(p => ({ ...p }));
   };
 
   /**
    * 드래그가 지속되는 동안 호출되는 함수
-   * @param event - 드래그 이벤트
    */
   const handleDrag = (event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
     if (dragItem.current === null || !containerRef.current) return;
-  
-    const draggedIndex = dragItem.current;
-    const draggedPanel = panelList[draggedIndex];
+
+    const draggedPanel = dragItem.current;
     const { w = 1, h = 1 } = draggedPanel;
-  
+
     const containerRect = containerRef.current.getBoundingClientRect();
     const maxRows = Math.floor(containerHeight / rowHeight);
-  
+
+    if (event.clientX === 0 && event.clientY === 0) return;
+
     const { x, y } = getDropPosition({
       event,
       config: {
@@ -145,33 +136,48 @@ const PanelGrid = ({
         panelSize: { w, h }
       },
     });
-  
+
+    // ✅ 좌표 변화 없으면 아무것도 하지 않음
+    const last = lastDragOverPosRef.current;
+    if (last && last.x === x && last.y === y) return;
+
+    lastDragOverPosRef.current = { x, y };
     setDragOverPosition({ x, y, w, h });
-  
+
     const tempDragged = { ...draggedPanel, x, y };
-  
-    const isOverlap = panelList.some((panel, idx) => {
-      if (idx === draggedIndex) return false;
+
+    const isOverlap = panelList.some((panel) => {
+      if (panel.id === draggedPanel.id) return false;
       return isColliding(tempDragged, panel);
     });
-  
-    if (isOverlap) {
-      const updated = resolveCollisions(tempDragged, panelList);
-      setPanelList(updated);
-    } else {
-      setPanelList(originalPanels.current.map(p => ({ ...p })));
+
+    const nextList = isOverlap
+      ? resolveCollisions(tempDragged, panelList)
+      : originalPanels.current.map((p) => ({ ...p }));
+
+    const hasChanged = nextList.some((panel, i) => {
+      const prev = panelList[i];
+      return (
+        panel.x !== prev.x ||
+        panel.y !== prev.y ||
+        panel.w !== prev.w ||
+        panel.h !== prev.h
+      );
+    });
+
+    if (hasChanged) {
+      setPanelList(nextList);
     }
-  };  
+  };
+
 
   /**
    * 드래그가 종료되었을 때 호출되는 함수
-   * @param event - 드롭 이벤트
    */
   const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
     if (dragItem.current === null || !containerRef.current) return;
 
-    const draggedIndex = dragItem.current;
-    const draggedPanel = panelList[draggedIndex];
+    const draggedPanel = dragItem.current;
     const { w = 1, h = 1 } = draggedPanel;
 
     const containerRect = containerRef.current.getBoundingClientRect();
@@ -192,13 +198,103 @@ const PanelGrid = ({
     });
 
     const updatedPanels = resolveCollisions(
-      { ...draggedPanel, x: x, y: y },
+      { ...draggedPanel, x, y },
       panelList
     );
 
-    setPanelList(updatedPanels);
-    setDragOverPosition(null);
+    const hasChanged = updatedPanels.some((panel, i) => {
+      const prev = panelList[i];
+      return (
+        panel.x !== prev.x ||
+        panel.y !== prev.y ||
+        panel.w !== prev.w ||
+        panel.h !== prev.h
+      );
+    });
+
+    if (hasChanged) {
+      requestAnimationFrame(() => {
+        setPanelList(updatedPanels);
+        setDragOverPosition(null);
+      });
+    } else {
+      setDragOverPosition(null);
+    }
   };
+
+  /**
+   * 드래그 중인 패널의 스타일을 계산하는 함수
+   */
+  const dropIndicatorElement = useMemo(() => {
+    if (!dragOverPosition) return null;
+
+    return (
+      <div
+        className={styles.dropIndicator}
+        style={calculatePanelStyle({
+          dimensions: dragOverPosition,
+          unitWidth,
+          rowHeight,
+          cols,
+          marginX: margin[0],
+          marginY: margin[1],
+          paddingX: padding[0],
+          paddingY: padding[1],
+        })}
+      />
+    );
+  }, [dragOverPosition, unitWidth, rowHeight, cols, margin, padding]);
+
+
+  /**
+   * 자식 요소들을 스타일링하여 반환하는 함수
+   */
+  const styledChildren = useMemo(() => {
+    return childrenArray.map((child, index) => {
+      if (!isValidElement(child)) return null;
+
+      const panel = panelList[index];
+      const style = calculatePanelStyle({
+        dimensions: {
+          x: panel?.x,
+          y: panel?.y,
+          w: panel?.w,
+          h: panel?.h,
+        },
+        unitWidth,
+        rowHeight,
+        cols,
+        marginX: margin[0],
+        marginY: margin[1],
+        paddingX: padding[0],
+        paddingY: padding[1],
+      });
+
+      const element = child as React.ReactElement<GridChildProps>;
+
+      return cloneElement(element, {
+        'data-testid': 'grid-panel',
+        draggable: true,
+        key: panel?.id || `default-key-${index}`,
+        style: { ...style, ...(element.props.style || {}) },
+        className: [styles.gridItemPanel, element.props.className]
+          .filter(Boolean)
+          .join(' '),
+        onDragStart: () => handleDragStart(panel),
+        onDrag: handleDrag,
+        onDragEnd: handleDrop,
+      });
+    });
+  }, [
+    childrenArray,
+    panelList,
+    unitWidth,
+    rowHeight,
+    cols,
+    margin,
+    padding,
+  ]);
+
 
   return (
     <div
@@ -207,57 +303,8 @@ const PanelGrid = ({
       className={styles.gridContainer}
       data-testid="grid-container"
     >
-      {dragOverPosition && (
-        <div
-          className={styles.dropIndicator}
-          style={calculatePanelStyle({
-            dimensions: dragOverPosition,
-            unitWidth,
-            rowHeight,
-            cols,
-            marginX: margin[0],
-            marginY: margin[1],
-            paddingX: padding[0],
-            paddingY: padding[1],
-          })}
-        />
-      )}
-
-      {childrenArray.map((child, index) => {
-        if (!isValidElement(child)) return null;
-        
-        const panel = panelList[index];
-        const style = calculatePanelStyle({
-          dimensions: {
-            x: panel?.x,
-            y: panel?.y,
-            w: panel?.w,
-            h: panel?.h,
-          },
-          unitWidth,
-          rowHeight,
-          cols,
-          marginX: margin[0],
-          marginY: margin[1],
-          paddingX: padding[0],
-          paddingY: padding[1],
-        });
-
-        const element = child as React.ReactElement<GridChildProps>;
-
-        return cloneElement(element, {
-          'data-testid': 'grid-panel',
-          draggable: true,
-          key: panel?.id || `default-key-${index}`,
-          style: { ...style, ...(element.props.style || {}) },
-          className: [styles.gridItemPanel, element.props.className]
-            .filter(Boolean)
-            .join(' '),
-          onDragStart: () => handleDragStart(index),
-          onDragEnd: handleDrop,
-          onDrag: handleDrag,
-        });
-      })}
+      {dropIndicatorElement}
+      {styledChildren}
     </div>
   );
 };

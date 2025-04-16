@@ -8,7 +8,6 @@ export function clamp(value: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, value));
 };
 
-
 /**
  * 두 패널이 겹치는지 여부를 반환합니다.
  * @returns true = 겹침, false = 겹치지 않음
