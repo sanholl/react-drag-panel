@@ -21,6 +21,11 @@ const App = () => {
         rowHeight={40} 
         width={1200} 
         margin={[10, 10]}
+        onLayoutChange={(newLayout) => {
+          console.log('Layout changed:', newLayout);
+        }}
+        isDraggable={true}
+        preventCollision={true}
       >
         {panels.map(panel => (
           <div key={panel.id} className="border border-gray-300 text-center">{panel.content}</div>

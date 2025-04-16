@@ -40,6 +40,23 @@ interface PanelGridProps {
    * 기본값은 [0, 0]
    */
   padding?: [number, number];
+  
+  /**
+   * 드래그 앤 드롭 기능 활성화 여부
+   * 기본값은 true
+   */
+  isDraggable?: boolean;
+
+  /**
+   * 드래그 앤 드롭 시 패널 간 충돌 방지 여부
+   * 기본값은 true
+   */
+  preventCollision?: boolean;
+
+  /**
+   * 패널 위치가 변경될 때 호출되는 콜백 함수
+   */
+  onLayoutChange?: (layout: Panel[]) => void;
 
   /** 
    * 각 패널에 대응되는 자식 React 요소들 
@@ -75,6 +92,9 @@ const PanelGrid = ({
   width = 1200,
   margin = [0, 0],
   padding = [0, 0],
+  isDraggable = true,
+  preventCollision = true,
+  onLayoutChange,
   children,
 }: PanelGridProps): JSX.Element => {
   const [panelList, setPanelList] = useState<Panel[]>(panels);
@@ -133,11 +153,10 @@ const PanelGrid = ({
         margin,
         cols,
         maxRows,
-        panelSize: { w, h }
+        panelSize: { w, h },
       },
     });
 
-    // ✅ 좌표 변화 없으면 아무것도 하지 않음
     const last = lastDragOverPosRef.current;
     if (last && last.x === x && last.y === y) return;
 
@@ -145,15 +164,14 @@ const PanelGrid = ({
     setDragOverPosition({ x, y, w, h });
 
     const tempDragged = { ...draggedPanel, x, y };
+    const isOverlap = panelList.some(
+      (panel) => panel.id !== draggedPanel.id && isColliding(tempDragged, panel)
+    );
 
-    const isOverlap = panelList.some((panel) => {
-      if (panel.id === draggedPanel.id) return false;
-      return isColliding(tempDragged, panel);
-    });
-
-    const nextList = isOverlap
-      ? resolveCollisions(tempDragged, panelList)
-      : originalPanels.current.map((p) => ({ ...p }));
+    let nextList = originalPanels.current.map((p) => ({ ...p }));
+    if (preventCollision && isOverlap) {
+      nextList = resolveCollisions(tempDragged, panelList);
+    }
 
     const hasChanged = nextList.some((panel, i) => {
       const prev = panelList[i];
@@ -169,7 +187,6 @@ const PanelGrid = ({
       setPanelList(nextList);
     }
   };
-
 
   /**
    * 드래그가 종료되었을 때 호출되는 함수
@@ -193,14 +210,23 @@ const PanelGrid = ({
         margin,
         cols,
         maxRows,
-        panelSize: { w, h }
+        panelSize: { w, h },
       },
     });
 
-    const updatedPanels = resolveCollisions(
-      { ...draggedPanel, x, y },
-      panelList
+    const tempDragged = { ...draggedPanel, x, y };
+    const isOverlap = panelList.some(
+      (panel) => panel.id !== draggedPanel.id && isColliding(tempDragged, panel)
     );
+
+    let updatedPanels = panelList;
+    if (preventCollision && isOverlap) {
+      updatedPanels = resolveCollisions(tempDragged, panelList);
+    } else {
+      updatedPanels = panelList.map((panel) =>
+        panel.id === draggedPanel.id ? { ...panel, x, y } : panel
+      );
+    }
 
     const hasChanged = updatedPanels.some((panel, i) => {
       const prev = panelList[i];
@@ -215,10 +241,13 @@ const PanelGrid = ({
     if (hasChanged) {
       requestAnimationFrame(() => {
         setPanelList(updatedPanels);
+        onLayoutChange?.(updatedPanels);
         setDragOverPosition(null);
+        lastDragOverPosRef.current = null;
       });
     } else {
       setDragOverPosition(null);
+      lastDragOverPosRef.current = null;
     }
   };
 
@@ -274,15 +303,15 @@ const PanelGrid = ({
 
       return cloneElement(element, {
         'data-testid': 'grid-panel',
-        draggable: true,
         key: panel?.id || `default-key-${index}`,
         style: { ...style, ...(element.props.style || {}) },
         className: [styles.gridItemPanel, element.props.className]
-          .filter(Boolean)
-          .join(' '),
-        onDragStart: () => handleDragStart(panel),
-        onDrag: handleDrag,
-        onDragEnd: handleDrop,
+        .filter(Boolean)
+        .join(' '),
+        draggable: isDraggable !== false,
+        onDragStart: isDraggable !== false ? () => handleDragStart(panel) : undefined,
+        onDrag: isDraggable !== false ? handleDrag : undefined,
+        onDragEnd: isDraggable !== false ? handleDrop : undefined,
       });
     });
   }, [
