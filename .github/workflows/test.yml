@@ -2,12 +2,15 @@ name: Test on PR
 
 on:
   pull_request:
-    branches: [main]
+    types: [opened, synchronize]
+    branches:
+      - main
 
 jobs:
   test:
     name: Run Tests
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
