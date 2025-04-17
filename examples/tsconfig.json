@@ -1,0 +1,13 @@
+{
+  "files": [],
+  "references": [
+    { "path": "./tsconfig.app.json" },
+    { "path": "./tsconfig.node.json" }
+  ],
+  "compilerOptions": {
+    "types": ["node"],
+    "module": "ESNext",         // Vite는 기본적으로 ESNext
+    "moduleResolution": "Node", // Node 방식으로 모듈을 해석
+    "target": "ESNext",
+  }
+}

@@ -1,5 +1,4 @@
-import React from 'react';
-import PanelGrid from "../src/components/PanelGrid";
+import { PanelGrid } from '../../src';
 
 const Example1 = () => {
   const panels = [
@@ -12,13 +11,13 @@ const Example1 = () => {
   ];
 
   return (
-    <div className="m-5 p-5 border">
-      <h1 className="text-xl mb-4 font-bold">react-drag-panel 예제1</h1>
+    <div className="bg-[#0e0e2c] min-h-screen text-white px-10 py-8">
+      <h1 className="text-2xl font-bold mb-6">🧱 react-drag-panel 예제 1</h1>
       <PanelGrid
         panels={panels}
         cols={24}
-        rowHeight={40} 
-        width={1200} 
+        rowHeight={40}
+        width={1200}
         margin={[10, 10]}
         onLayoutChange={(newLayout) => {
           console.log('Layout changed:', newLayout);
@@ -26,12 +25,17 @@ const Example1 = () => {
         isDraggable={true}
         preventCollision={true}
       >
-        {panels.map(panel => (
-          <div key={panel.id} className="border border-gray-300 text-center">{panel.content}</div>
+        {panels.map((panel) => (
+          <div
+            key={panel.id}
+            className="h-full w-full bg-[#1b1b3a] border border-[#3f3f7f] rounded-lg shadow-md flex items-center justify-center text-lg font-semibold"
+          >
+            {panel.content}
+          </div>
         ))}
       </PanelGrid>
     </div>
   );
-}
+};
 
 export default Example1;

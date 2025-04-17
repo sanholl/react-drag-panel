@@ -1,8 +1,4 @@
-import './index.css';
-
-import React from 'react';
-import { Route, Routes, Navigate, useLocation } from 'react-router-dom';
-import PanelGrid from '../src/components/PanelGrid';
+import { Route, Routes } from 'react-router-dom';
 import Example1 from './Example1';
 import Example2 from './Example2';
 
