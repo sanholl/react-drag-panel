@@ -9,9 +9,9 @@
     "dist"
   ],
   "scripts": {
-    "build": "vite build && tsc --emitDeclarationOnly --declaration --outDir dist",
     "dev": "vite",
-    "test": "vitest --config vitest.config.ts",
+    "build": "tsup",
+    "test": "vitest",
     "lint": "eslint ."
   },
   "peerDependencies": {
@@ -33,6 +33,7 @@
     "globals": "^15.15.0",
     "jsdom": "^26.0.0",
     "postcss": "^8.5.3",
+    "tsup": "^8.4.0",
     "typescript": "~5.7.2",
     "typescript-eslint": "^8.24.1",
     "vite": "^6.2.0",
