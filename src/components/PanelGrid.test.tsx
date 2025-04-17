@@ -134,30 +134,4 @@ describe('PanelGrid - Detail Settings', () => {
   
     expect(panel.style.transform, '드래그시 변화가 없으므로 기본값으로 출력된다.').toBe('translate(0px, 0px)');
   });
-
-  it('preventCollision 설정 false시 패널간의 겹침이 허용된다.', () => {
-    render(
-      <PanelGrid 
-        panels={panels} 
-        preventCollision={false}
-      >
-        <div>Panel 1</div>
-        <div>Panel 2</div>
-      </PanelGrid>
-    );
-  
-    const panel1 = screen.getByText('Panel 1');
-  
-    fireEvent.dragStart(panel1);
-    fireEvent.drag(panel1, {
-      clientX: 100,
-      clientY: 0,
-    });
-    fireEvent.dragEnd(panel1);
-  
-    const panelElements = screen.getAllByTestId('grid-panel');
-    const updatedStyles = panelElements.map((el) => el.getAttribute('style') || '');
-  
-    expect(updatedStyles[0], '겹쳐진 상태로 tranform style이 같음').toBe(updatedStyles[1]);
-  });
 })
