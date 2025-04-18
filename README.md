@@ -51,7 +51,7 @@ type Panel = {
 | `x` | 그리드 내 가로 위치 (열 인덱스) |
 | `y` | 그리드 내 세로 위치 (행 인덱스) |
 | `w` | 가로 너비 (몇 칸 차지하는지) |
-| `h` c 세로 높이 (몇 줄 차지하는지) |
+| `h` | 세로 높이 (몇 줄 차지하는지) |
 | `content` | 렌더링할 내용 (선택) |
 
 ---
@@ -96,10 +96,6 @@ cd examples
 npm install
 npm run dev
 ```
-
-- / → 기본 예제
-- /options → isDraggable, preventCollision 등 옵션 variation 예제
-
 
 ## License
 
