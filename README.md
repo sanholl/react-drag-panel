@@ -5,8 +5,10 @@
 
 ---
 
-### Github
-[react-grid-panel / Github](https://github.com/sanholl/react-drag-panel)
+## 🔗 link
+
+### GITHUB
+: [react-grid-panel / Github](https://github.com/sanholl/react-drag-panel)
 
 ---
 
