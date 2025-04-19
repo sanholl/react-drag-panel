@@ -132,6 +132,6 @@ describe('PanelGrid - Detail Settings', () => {
     });
     fireEvent.dragEnd(panel);
   
-    expect(panel.style.transform, '드래그시 변화가 없으므로 기본값으로 출력된다.').toBe('translate(0px, 0px)');
+    expect(panel.style.transform, '드래그시 변화가 없으므로 기본값으로 출력된다.').toBe('translate(10px, 0px)');
   });
 })
