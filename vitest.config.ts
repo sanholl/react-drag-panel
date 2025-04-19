@@ -5,7 +5,15 @@ const vitestConfig = {
     globals: true,
     environment: 'jsdom',
     setupFiles: './src/test/setup.ts',
-    tsconfig: './tsconfig.vitest.json'
+    tsconfig: './tsconfig.vitest.json',
+    coverage: {
+      reporter: ['text', 'lcov', 'html'],
+      exclude: [
+        'examples/**',
+        '**/*.config.{js,ts}',
+        'src/types/**',
+      ]
+    }
   }
 }
 
