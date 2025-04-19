@@ -2,12 +2,12 @@ codecov:
   require_ci_to_pass: yes
 
 comment:
-  layout: "condensed_header, condensed_files, condensed_footer"
-  require_changes: true
-  require_head: true
-  require_base: true
+  layout: "reach,diff,flags,files"
+  behavior: new
+  require_changes: false
+  after_n_builds: 1
+  show_carryforward_flags: false
   hide_project_coverage: true
-
 
 coverage:
   precision: 2
