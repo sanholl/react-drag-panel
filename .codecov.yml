@@ -2,7 +2,7 @@ codecov:
   require_ci_to_pass: yes
 
 comment:
-  layout: "reach,diff,flags,files"
+  layout: "header, diff, flags, files, footer"
   behavior: new
   require_changes: false
   after_n_builds: 1

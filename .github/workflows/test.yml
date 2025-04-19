@@ -26,7 +26,7 @@ jobs:
       - name: Run Tests with Coverage
         run: npm run test:ci
 
-      - name: Upload coverage reports to Codecov
+      - name: Show Test Coverage
         uses: codecov/codecov-action@v5
         with:
           files: ./coverage/lcov.info
