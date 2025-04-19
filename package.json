@@ -28,7 +28,7 @@
   "bugs": {
     "url": "https://github.com/sanholl/react-drag-panel/issues"
   },
-  "author": "Hansol Jang <edgar.jang93@egmail.com>",
+  "author": "Hansol Jang <edgar.jang93@gmail.com>",
   "license": "MIT",
   "scripts": {
     "dev": "vite",
