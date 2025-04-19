@@ -1,24 +1,17 @@
 # 🧩 react-drag-panel
 
-> React 기반의 드래그 & 드롭으로 재배치 가능한 격자 기반 패널 레이아웃 컴포넌트
-> `react-grid-layout`보다 가볍고, 단순한 기능 위주로 설계되었습니다.
+- React 기반의 드래그 & 드롭으로 재배치 가능한 격자 기반 패널 레이아웃 컴포넌트
+- `react-grid-layout`보다 가볍고, 단순한 기능 위주로 설계되었습니다.
 
 ---
 
-## 🔗 link
-
-### GITHUB
-: [react-grid-panel / Github](https://github.com/sanholl/react-drag-panel)
-
----
-
-## 🎬 시연 영상
+## 🎬 실제 사용 예시
 
 ### Example1
-![example1](https://github.com/user-attachments/assets/8efb6004-6dbc-4876-8bbc-f5d8b6f36ea6)
+![Example1](https://github.com/user-attachments/assets/1ad23f43-33ab-4ed1-a59f-b8a1469b1d20)
 
 ### Example2
-![example2](https://github.com/user-attachments/assets/8a6a9568-20f1-4d8f-95af-e9bde68566e9)
+![Example2](https://github.com/user-attachments/assets/e6cceafe-ee74-4a74-8449-a1b6d47be5dd)
 
 ---
 
