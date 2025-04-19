@@ -2,7 +2,7 @@ name: Test and Coverage on PR
 
 on:
   pull_request:
-    types: [opened, synchronize]
+    types: [opened, synchronize, reopened]
     branches:
       - main
 
@@ -23,7 +23,7 @@ jobs:
       - name: Install Dependencies
         run: npm ci
 
-      - name: Run Tests With Coverage
+      - name: Run Tests with Coverage
         run: npm run test:ci
 
       - name: Upload coverage reports to Codecov

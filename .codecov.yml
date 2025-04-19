@@ -1,0 +1,23 @@
+codecov:
+  require_ci_to_pass: yes
+
+comment:
+  layout: "reach,diff,flags,files"
+  behavior: new
+  require_changes: false
+  after_n_builds: 1
+  show_carryforward_flags: false
+
+coverage:
+  precision: 2
+  round: down
+  range: "70...100"
+
+parsers:
+  javascript:
+    enable_partials: true
+
+ignore:
+  - "examples/*"
+  - "test-utils/*"
+  - "**/*.stories.tsx"
