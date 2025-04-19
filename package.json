@@ -33,7 +33,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsup",
-    "test": "vitest",
+    "test": "vitest ",
     "lint": "eslint ."
   },
   "peerDependencies": {
