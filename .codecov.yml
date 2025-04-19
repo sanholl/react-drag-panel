@@ -3,9 +3,9 @@ codecov:
 
 comment:
   layout: "condensed_header, condensed_files, condensed_footer"
-  require_changes: false
+  require_changes: true
   require_head: true
-  require_base: false
+  require_base: true
   hide_project_coverage: true
 
 
