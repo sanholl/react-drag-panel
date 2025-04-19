@@ -5,7 +5,14 @@
 
 ---
 
-## 🎬 실제 사용 예시
+## 🎬 Examples
+- 예제는 examples/ 폴더에 포함되어 있습니다:
+
+```
+cd examples
+npm install
+npm run dev
+```
 
 ### Example1
 ![Example1](https://github.com/user-attachments/assets/1ad23f43-33ab-4ed1-a59f-b8a1469b1d20)
@@ -15,7 +22,7 @@
 
 ---
 
-## 📦 설치
+## 📦 Install
 
 ```bash
 npm install react-drag-panel
@@ -24,7 +31,7 @@ yarn add react-drag-panel
 
 ```
 
-## 🧱 Panel 구조
+## 🧱 Panel layout
 
 `panel` prop은 다음과 같은 구조의 배열입니다.
 
@@ -51,7 +58,32 @@ type Panel = {
 
 ---
 
-## ✨ 주요 기능
+## 🧰 Usage
+```
+<PanelGrid
+  panels={panels}
+  cols={24}
+  rowHeight={40}
+  width={1200}
+  margin={[10, 10]}
+  isDraggable={true}
+  preventCollision={true}
+  onLayoutChange={(newLayout) => {
+    console.log('Layout changed:', newLayout);
+  }}
+>
+  {panels.map((panel) => (
+    <div
+      key={panel.id}
+      className="h-full w-full bg-[#1b1b3a] border border-[#3f3f7f] rounded-lg shadow-md flex items-center justify-center text-lg font-semibold"
+    >
+      {panel.content}
+    </div>
+  ))}
+</PanelGrid>
+```
+
+## ✨ Features
 
 - 드래그 & 드롭으로 위치 재배치
 - 충돌 방지 여부 설정 (preventCollision)
@@ -77,20 +109,12 @@ type Panel = {
 | onLayoutChange	| (layout: Panel[]) => void	| 레이아웃 변경 시 호출되는 콜백 함수	| undefined
 | children	| React.ReactNode	| 각 패널에 대응되는 컴포넌트	| -
 
-## 🧪 테스트
+## 🧪 Test
 
 ```
 npm run test
 ```
 
-## 🧰 예제
-- 예제는 examples/ 폴더에 포함되어 있습니다:
-
-```
-cd examples
-npm install
-npm run dev
-```
 
 ## License
 
