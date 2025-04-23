@@ -59,7 +59,7 @@ type Panel = {
 ---
 
 ## 🧰 Usage
-```
+```tsx
 <PanelGrid
   panels={panels}
   cols={24}
