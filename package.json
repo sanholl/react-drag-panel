@@ -2,7 +2,7 @@
   "name": "react-drag-panel",
   "version": "0.1.4",
   "description": "Drag & drop panel grid layout for React",
-  "main": "dist/index.cjs",
+  "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
   "files": [
@@ -61,7 +61,5 @@
     "vite": "^6.2.0",
     "vitest": "^3.1.1"
   },
-  "dependencies": {
-    "react-drag-panel": "file:"
-  }
+  "dependencies": {}
 }

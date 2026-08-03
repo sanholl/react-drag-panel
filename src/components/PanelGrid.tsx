@@ -1,4 +1,4 @@
-import React, { cloneElement, isValidElement, useMemo, useRef, useState } from 'react';
+import React, { cloneElement, isValidElement, useEffect, useMemo, useRef, useState } from 'react';
 import type { JSX } from 'react';
 import styles from './PanelGrid.module.css';
 import { calculateContainerHeight, calculatePanelStyle, getDropPosition, resolveCollisions } from '../utils/calculateUtils';
@@ -110,7 +110,7 @@ const PanelGrid = ({
     h: number;
   } | null>(null);
 
-  const unitWidth = width / cols;
+  const unitWidth = (width - margin[0] * (cols - 1)) / cols;
   const containerHeight = calculateContainerHeight({
     panels: panelList,
     rowHeight,
@@ -118,6 +118,11 @@ const PanelGrid = ({
     paddingY: padding[1],
   });
   const childrenArray = useMemo(() => React.Children.toArray(children), [children]);
+
+  // ponytail: 부모가 넘긴 panels 바뀌면 동기화. 드래그 중 부모 리렌더 겹치는 케이스는 아직 처리 안 함.
+  useEffect(() => {
+    setPanelList(panels);
+  }, [panels]);
 
 
   /**
@@ -170,7 +175,7 @@ const PanelGrid = ({
 
     let nextList = originalPanels.current.map((p) => ({ ...p }));
     if (preventCollision && isOverlap) {
-      nextList = resolveCollisions(tempDragged, panelList);
+      nextList = resolveCollisions(tempDragged, originalPanels.current);
     }
 
     const hasChanged = nextList.some((panel, i) => {
@@ -193,6 +198,13 @@ const PanelGrid = ({
    */
   const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
     if (dragItem.current === null || !containerRef.current) return;
+
+    if (event.clientX === 0 && event.clientY === 0) {
+      dragItem.current = null;
+      setDragOverPosition(null);
+      lastDragOverPosRef.current = null;
+      return;
+    }
 
     const draggedPanel = dragItem.current;
     const { w = 1, h = 1 } = draggedPanel;
@@ -219,9 +231,9 @@ const PanelGrid = ({
       (panel) => panel.id !== draggedPanel.id && isColliding(tempDragged, panel)
     );
 
-    let updatedPanels = panelList;
+    let updatedPanels = originalPanels.current.map(p => ({ ...p }));
     if (preventCollision && isOverlap) {
-      updatedPanels = resolveCollisions(tempDragged, panelList);
+      updatedPanels = resolveCollisions(tempDragged, originalPanels.current);
     } else {
       updatedPanels = panelList.map((panel) =>
         panel.id === draggedPanel.id ? { ...panel, x, y } : panel
@@ -239,12 +251,10 @@ const PanelGrid = ({
     });
 
     if (hasChanged) {
-      requestAnimationFrame(() => {
-        setPanelList(updatedPanels);
-        onLayoutChange?.(updatedPanels);
-        setDragOverPosition(null);
-        lastDragOverPosRef.current = null;
-      });
+      setPanelList(updatedPanels);
+      onLayoutChange?.(updatedPanels);
+      setDragOverPosition(null);
+      lastDragOverPosRef.current = null;
     } else {
       setDragOverPosition(null);
       lastDragOverPosRef.current = null;
@@ -328,6 +338,7 @@ const PanelGrid = ({
   return (
     <div
       ref={containerRef}
+      onDragOver={(e) => e.preventDefault()}
       style={{ height: containerHeight, width }}
       className={styles.gridContainer}
       data-testid="grid-container"
